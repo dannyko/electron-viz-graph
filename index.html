@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <script src="lib/vizflow.js"></script>
+    <script src="lib/vizflow-helper.js"></script>
+     <script>
+        var file;
+        var fileContent;
+        var fileLinesArray;
+        var coordinateArray = new Array();
+        function display_file_path()
+        {
+            <!--alert($fileName.val())-->
+            file = document.getElementById("file_field").files[0];
+            var fileName = document.getElementById("file_field").files[0].name;
+            var filePath = document.getElementById("file_field").files[0].path;
+            var fileNameDiv = document.getElementById("fileNameDisplay");
+            var filePathDiv = document.getElementById("fullPathDisplay");
+            fileNameDiv.innerHTML += fileName;
+            filePathDiv.innerHTML += filePath;
+            alert("Working?");
+        }
+        function parse_file_contents(fileString)
+        {
+          fileLinesArray = fileString.split("\n");
+          for (var i = 0; i < fileLinesArray.length; i++) 
+          {
+            var coordinate = fileLinesArray[i].split(",");
+            if (i>0)
+            {
+              coordinateArray.push({x:coordinate[0],y:coordinate[1]});
+            }
+            <!--display_contents("<div>Line: "+i+" is "+fileLinesArray[i]+"</div>");-->
+          }
+          for (var j = 0; j< fileLinesArray.length-1; j++)
+          {
+            <!-- WHY DO I NEED PARENTHESIS AROUND THE coordinateArray ACCESS below? -->
+            display_contents("<div>Line: "+(j+1)+" is X:"+(coordinateArray[j].x)+" Y:"+(coordinateArray[j].y)+"</div>");
+          }
+        }
+
+        function display_file_contents()
+        {
+          var reader = new FileReader();
+          reader.onload = function(e) 
+          {
+            var fileContent = e.target.result;
+            parse_file_contents(fileContent);
+          };
+          reader.readAsText(file);
+        }
+
+        function display_contents(contents) 
+        {
+          var element = document.getElementById('fileContentsDisplay');
+          element.innerHTML += contents;
+          window.scrollTo(0,document.body.scrollHeight);
+        }
+    </script>
+  </head>
+  <body>
+    <h1>Electron-Viz-Graph</h1>
+    <script>
+      document.dur = 400 ;
+    </script>
+    <script src="src/nodeModule.js"></script>
+    <script src="src/electron-viz-graph.js"></script>
+    <script>
+        electron_viz_graph() ; 
+    </script>    
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+<!--     I are using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>. -->
+
+    <div>
+    <input id="file_field" type="file"></input>
+    <button type="button" onclick="display_file_path();">Display file path</button>
+    <button type="button" onclick="display_file_contents();">List File Content</button>
+    </div>
+    <div id="fileNameDisplay">
+    Filename: 
+    </div>
+    <div id="fullPathDisplay">
+    Full File Path: 
+    </div>
+    <div id="fileContentsDisplay">
+
+    </div>
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+  </script>
+</html>
